@@ -1,2 +1,5 @@
 env
 infraestrutura
+*.json
+pipeline.conf
+raw
