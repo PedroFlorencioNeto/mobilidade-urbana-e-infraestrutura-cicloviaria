@@ -1,9 +1,10 @@
+import boto3
 import pandas as pd
 from logging import info
 from prefect import task
 from configparser import ConfigParser
 
-@task(name="Extracao de dados", description="Extrai dados contidos em um bucket S3")
+#@task(name="Extracao de dados", description="Extrai dados contidos em um bucket S3")
 def extract_data(bucket_name: str, folder_name: str) -> str:
     '''
     Função que realiza o download dos arquivos (formato xls ou xlsx) de sinistros de trânsito 
@@ -24,10 +25,24 @@ def extract_data(bucket_name: str, folder_name: str) -> str:
     # Acessando credenciais da AWS
     config = ConfigParser()
     config.read('pipeline.conf')
-
-    print(config['aws_boto_credentials']['access_key'])
-
-
+    ACCESS_KEY = config['aws_boto_credentials']['access_key']
+    SECRET_KEY = config['aws_boto_credentials']['secret_key']
+    
+    # Acessando os dados contidos no bucket especificado
+    s3_resource = boto3.resource('s3', aws_access_key_id=ACCESS_KEY, aws_secret_key_id=SECRET_KEY)
+    Bucket = s3_resource.Bucket(bucket_name)
+  
+    for object in Bucket.objects.filter(Prefix=folder_name):
+        print(object.key)
     info('Os dados foram baixados corretamente!')
-    return raw_data
+
+    return "Pedro"
+
+extract_data("diobs-frente-verso-ciclomobilidade", "Sinistros/")
+
+@task
+def transform_data():
+
+@task
+def load_data(dataFrame: pd.DataFrame) ->
 
