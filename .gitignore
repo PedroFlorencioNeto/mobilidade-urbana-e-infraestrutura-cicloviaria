@@ -4,3 +4,4 @@ infraestrutura
 pipeline.conf
 raw
 bronze
+__pycache__
