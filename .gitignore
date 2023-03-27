@@ -3,3 +3,4 @@ infraestrutura
 *.json
 pipeline.conf
 raw
+bronze
