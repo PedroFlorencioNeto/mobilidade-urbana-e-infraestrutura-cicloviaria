@@ -13,7 +13,7 @@ from configparser import ConfigParser
 # (L)oad de dados no banco de dados Postgres e na pasta "Silver";
 # (T)ransformação de dados para uso a nível de negócio e exportação para a pasta "Gold".
 
-#@task(name="Extracao de dados", description="Extrai dados contidos em um bucket S3")
+@task(name="Extract", description="Extrai dados contidos em um bucket S3")
 def extract_data(bucket_name: str, folder_name: str) -> pd.DataFrame:
     '''
     Função que realiza o download dos arquivos (formato xls ou xlsx) de sinistros de trânsito 
@@ -59,9 +59,37 @@ def extract_data(bucket_name: str, folder_name: str) -> pd.DataFrame:
     df_temp['Ano'] = np.arange(2015,2020,1)
     df = df_temp
 
-    info('Os dados foram baixados corretamente!')
+    info('200: Os dados presentes no bucket S3 foram baixados corretamente!')
 
     return df
 
-bucket = "diobs-frente-verso-ciclomobilidade"
-folder = "Sinistros/"
+@task(name='Transform', description='Transforma o DataFrame recebido da task Extract')
+def transform_data(df:pd.DataFrame) -> pd.DataFrame:
+    """
+    Função que transforma o DataFrame com dados de sinistros de todos os tipos de veículos
+    e exporta uma coluna com a série histórica dos sinistros para um tipo de veículo.
+
+    Args:
+        df (pd.DataFrame):DataFrame do pandas com os sinistros
+    
+    Returns:
+        df_business_level (pd.DataFrame): DataFrame do Pandas com a série histórica do veículo bicicleta
+    """
+    df = df['Bicicleta']
+
+    info("200: Dados históricos de sinistros de bicicletas processados!")
+
+    return df
+
+@task(name='Load', description='Carrega os dados recebidos da task Transform')
+def load_data(df:pd.DataFrame) -> None:
+    """
+    Função que salva o DataFrame em um arquivo CSV e carrega no Data Warehouse (Postgres)
+    Args:
+        df (pd.DataFrame): DataFrame com os dados processados;
+    
+    Returns:
+        None
+    """
+    df.to_csv("sinistros-bikes-2015-2019", index = False)
+    info("200: Dados exportados em CSV")
