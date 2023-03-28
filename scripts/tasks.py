@@ -1,4 +1,3 @@
-import os
 import boto3
 import numpy as np
 import pandas as pd
@@ -86,7 +85,7 @@ def transform_data(list_objects: list, bucket_name: str) -> pd.DataFrame:
     df_temp['Ano'] = np.arange(2015,2020,1)
     df = df_temp
 
-    info("200: Dados históricos de sinistros de bicicletas processados!")
+    info("200: Dados historicos de sinistros de bicicletas processados!")
 
     return df
 
